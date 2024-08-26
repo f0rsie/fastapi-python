@@ -1,0 +1,29 @@
+#pgadmin
+#volume db
+
+services:
+  fastapi:
+    container_name: fastapi
+    depends_on:
+      - db
+    build:
+      context: .
+      dockerfile: Dockerfile
+    env_file:
+      - env.env
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./src/files/:/app/src/files/:rw
+    
+  db:
+    image: postgres
+    restart: always
+    environment:
+      PGDATA: "/var/lib/postgresql/data"
+    env_file:
+      - env.env
+    volumes:
+      - ./db/script.sql:/docker-entrypoint-initdb.d/init.sql
+    ports:
+      - "5432:5432"
