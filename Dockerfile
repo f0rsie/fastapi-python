@@ -7,7 +7,7 @@ COPY requirements.txt .
 RUN pip install -r requirements.txt
 RUN apt-get update && apt-get install -y iputils-ping
 
-COPY src/* ./src/
+COPY src/ ./src/
 
 WORKDIR /app/src
 

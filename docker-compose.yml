@@ -25,5 +25,6 @@ services:
       - env.env
     volumes:
       - ./db/script.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./pgdata/:/var/lib/postgresql/data/:rw
     ports:
       - "5432:5432"

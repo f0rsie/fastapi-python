@@ -1,10 +1,10 @@
--- Active: 1724671743141@@127.0.0.1@5432@postgres
+-- Active: 1724680656125@@127.0.0.1@5432@fastapi
 CREATE SCHEMA fastapi;
 
-CREATE TABLE "fastapi"."Pings" (
-    "Id" SERIAL PRIMARY KEY,
-    "Url" VARCHAR(50) NOT NULL,
-    "IsAvailable" BOOLEAN NOT NULL,
-    "Ping" VARCHAR(50) NOT NULL,
-    "Time" VARCHAR(60) NOT NULL
+CREATE TABLE "fastapi"."pings" (
+    "id" INTEGER PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+    "url" VARCHAR(50) NOT NULL,
+    "is_available" BOOLEAN NOT NULL,
+    "ping" VARCHAR(50) NOT NULL,
+    "time" VARCHAR(60) NOT NULL
 )
