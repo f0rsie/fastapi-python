@@ -10,7 +10,7 @@ services:
       context: .
       dockerfile: Dockerfile
     env_file:
-      - env.env
+      - .env
     ports:
       - "8000:8000"
     volumes:
@@ -22,7 +22,7 @@ services:
     environment:
       PGDATA: "/var/lib/postgresql/data"
     env_file:
-      - env.env
+      - .env
     volumes:
       - ./db/script.sql:/docker-entrypoint-initdb.d/init.sql
       - ./pgdata/:/var/lib/postgresql/data/:rw
