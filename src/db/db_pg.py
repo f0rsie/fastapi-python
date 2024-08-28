@@ -6,19 +6,14 @@ from db.models.model_base import ModelBase
 
 
 class DbPg(DbBase):
-    connection = None
+    conenction = None
 
-    def check_connection(self) -> Any | None:
+    def __init__(self):
         try:
-            if self.connection is not None:
-                return self.connection
-            else:
-                return None
+            self.conenct()
 
         except Exception as ex:
             print(ex)
-
-            return None
 
     def conenct(self):
         try:
@@ -31,97 +26,106 @@ class DbPg(DbBase):
             )
             self.connection = connection
 
-            return connection
+        except Exception as ex:
+            print(ex)
+
+    def get_all(self, table_name: str) -> list[ModelBase]:
+        result: list[ModelBase] = []
+        try:
+            if self.connection is None:
+                self.conenct()
+
+            cursor = self.connection.cursor()
+            cursor.execute('SELECT * FROM "fastapi"."%s"', table_name)
+
+            records = cursor.fetchone()
+            print(records)
+            self.connection.commit()
+            cursor.close()
 
         except Exception as ex:
             print(ex)
 
-            return None
+        finally:
+            return result
 
-    def get_all(self, table_name: str) -> list[ModelBase]:
-        connection = self.conenct()
+    def get_by(self, table_name: str, parameters: dict[str, Any]) -> list[Any]:
+        result: list[Any] = []
+        try:
+            if self.connection is None:
+                self.conenct()
 
-        if connection is not None:
-            try:
-                result: list[ModelBase] = []
+            parameters_query: str = ""
 
-                cursor = connection.cursor()
-                cursor.execute('SELECT * FROM "fastapi"."%s"', table_name)
+            for par in parameters.keys():
+                parameters_query += " AND ".join(list([f"{par}={parameters.get(par)}"]))
+                print(par)
 
-                records = cursor.fetchone()
-                print(records)
-                connection.commit()
-                cursor.close()
+            query_str: str = f"""SELECT * FROM "fastapi"."{table_name}" 
+                                WHERE {parameters_query}"""
 
-                return result
+            cursor = self.connection.cursor()
+            cursor.execute(query_str)
 
-            except Exception as ex:
-                print(ex)
+            result = cursor.fetchall()
 
-                return []
+            self.connection.commit()
+            cursor.close()
 
-            finally:
-                connection.close()
-        else:
-            raise Exception
-        
-    def get_by(self, table_name: str, parameters: dict[str, Any]) -> list[Any] | None:
-        connection = self.conenct()
+        except Exception as ex:
+            print(ex)
 
-        if connection is not None:
-            try:
-                result: list[Any] = []
-                
-                parameters_query: str = ''
+        finally:
+            return result
 
-                print(parameters)
+    def delete_by(self, table_name: str, parameters: dict[str, Any]) -> bool:
+        result: bool = False
+        try:
+            if self.connection is None:
+                self.conenct()
 
-                for par in parameters.keys():
-                    parameters_query += ' AND '.join(list([f"{par}={parameters.get(par)}"]))
-                    print(par)
+            parameters_query: str = ""
 
-                query_str: str = f"""SELECT * FROM "fastapi"."{table_name}" 
-                                    WHERE {parameters_query}"""
-                
-                cursor = connection.cursor()
-                cursor.execute(query_str)
+            for par in parameters.keys():
+                parameters_query += " AND ".join(list([f"{par}={parameters.get(par)}"]))
+                print(par)
 
-                result = cursor.fetchall()
+            query_str: str = f"""DELETE FROM "fastapi"."{table_name}" 
+                                WHERE {parameters_query}"""
 
-                connection.commit()
-                cursor.close()
+            cursor = self.connection.cursor()
+            cursor.execute(query_str)
 
-                return result
+            self.connection.commit()
+            cursor.close()
 
-            except Exception as ex:
-                print(ex)
+            result = True
 
-                return []
+        except Exception as ex:
+            print(ex)
 
-    def add_to(self, table_name: str, table: ModelBase) -> ModelBase:
-        connection = self.conenct()
+        finally:
+            return result
 
-        if connection is not None:
-            try:
-                result: ModelBase = table
+    def add_to(self, table_name: str, table: ModelBase) -> bool:
+        result: bool = False
+        try:
+            if self.connection is None:
+                self.conenct()
 
-                query_str: str = f"""INSERT INTO "fastapi"."{table_name}"({", ".join(map(str, tuple(table.get_fields())))}) 
-                                    VALUES {tuple(table.get_values())}"""
+            query_str: str = f"""INSERT INTO "fastapi"."{table_name}"({", ".join(map(str, tuple(table.get_fields())))}) 
+                                VALUES {tuple(table.get_values())}"""
 
-                cursor = connection.cursor()
-                cursor.execute(query_str)
+            cursor = self.connection.cursor()
+            cursor.execute(query_str)
 
-                connection.commit()
-                cursor.close()
+            self.connection.commit()
+            cursor.close()
 
-                return result
+            result = True
 
-            except Exception as ex:
-                print(ex)
+        except Exception as ex:
+            print(ex)
 
-                return table
-
-            finally:
-                connection.close()
-        else:
-            raise Exception
+        finally:
+            return result

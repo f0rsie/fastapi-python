@@ -17,5 +17,9 @@ class DbBase(ABC):
         pass
 
     @abstractmethod
-    def add_to(self, table_name: str, table: ModelBase) -> ModelBase:
+    def add_to(self, table_name: str, table: ModelBase) -> bool:
+        pass
+
+    @abstractmethod
+    def delete_by(self, table_name: str, parameters: dict[str, Any]) -> bool:
         pass
