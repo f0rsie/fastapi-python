@@ -11,7 +11,7 @@ class DaoBase(ABC):
         pass
 
     @abstractmethod
-    def get_all_data_from_db(self) -> list[ModelBase]:
+    def get_all_data_from_db(self, table_name: str) -> list[ModelBase]:
         pass
 
     @abstractmethod
@@ -19,11 +19,11 @@ class DaoBase(ABC):
         pass
 
     @abstractmethod
-    def delete_by_id(self, parameter: Any) -> bool:
+    def delete_by_id(self, table_name: str, id: int) -> bool:
         pass
 
     @abstractmethod
-    def get_data_by_id(self, parameter: Any) -> list[ModelBase]:
+    def get_data_by_id(self, table_name: str, id: int) -> list[ModelBase]:
         pass
 
     @abstractmethod

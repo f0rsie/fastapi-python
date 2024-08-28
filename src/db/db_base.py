@@ -13,7 +13,7 @@ class DbBase(ABC):
         pass
 
     @abstractmethod
-    def get_by(self, table_name: str, parameters: dict[str, Any]) -> list[Any]:
+    def get_by_id(self, table_name: str, id: int) -> list[Any]:
         pass
 
     @abstractmethod

@@ -25,10 +25,10 @@ class ResultDAO(DaoBase):
         finally:
             return result
 
-    def get_all_data_from_db(self) -> list[ModelBase]:
+    def get_all_data_from_db(self, table_name: str) -> list[ModelBase]:
         result: list[ModelBase] = []
         try:
-            result = self.db.get_all("pings")
+            result = self.db.get_all(table_name)
 
         except Exception as ex:
             print(ex)
@@ -36,10 +36,10 @@ class ResultDAO(DaoBase):
         finally:
             return result
 
-    def delete_by_id(self, id: int) -> bool:
+    def delete_by_id(self, table_name: str, id: int) -> bool:
         result: bool = False
         try:
-            result = self.db.delete_by_id("pings", id)
+            result = self.db.delete_by_id(table_name, id)
 
         except Exception as ex:
             print(ex)
@@ -58,11 +58,10 @@ class ResultDAO(DaoBase):
         finally:
             return result
 
-    def get_data_by_id(self, parameter: Any) -> list[ModelBase]:
+    def get_data_by_id(self, table_name: str, id: int) -> list[ModelBase]:
         result: list[ModelBase] = []
         try:
-            dictionary: dict[str, Any] = {"id": parameter}
-            result = self.db.get_by("pings", dictionary)
+            result = self.db.get_by_id(table_name, id)
 
         except Exception as ex:
             print(ex)

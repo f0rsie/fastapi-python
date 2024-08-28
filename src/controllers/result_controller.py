@@ -37,9 +37,9 @@ async def async_test():
 
 
 @result_router.get("/{id}")
-def get_by_id(id: int):
+def get_by_id(table: str, id: int):
     try:
-        result: list[ModelBase] = dao_model.get_data_by_id(id)
+        result: list[ModelBase] = dao_model.get_data_by_id(table, id)
 
         return result
 
@@ -48,9 +48,9 @@ def get_by_id(id: int):
 
 
 @result_router.delete("/delete/{id}")
-def delete_by_id(id: int):
+def delete_by_id(table: str, id: int):
     try:
-        result: bool = dao_model.delete_by_id(id)
+        result: bool = dao_model.delete_by_id(table, id)
 
         return result
 
@@ -61,7 +61,7 @@ def delete_by_id(id: int):
 @result_router.delete("/delete-by-sql-params/")
 def delete_by_sql_params(table: str, sql_params: str):
     try:
-        result: bool = dao_model.delete_by_sql_params("pings", sql_params)
+        result: bool = dao_model.delete_by_sql_params(table, sql_params)
 
         return result
     except Exception as ex:

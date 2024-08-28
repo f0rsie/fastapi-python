@@ -35,8 +35,10 @@ class DbPg(DbBase):
             if self.connection is None:
                 self.conenct()
 
+            query_str: str = f"""SELECT * FROM "fastapi"."{table_name}"""
+
             cursor = self.connection.cursor()
-            cursor.execute('SELECT * FROM "fastapi"."%s"', table_name)
+            cursor.execute(query_str)
 
             records = cursor.fetchone()
             print(records)
@@ -49,20 +51,14 @@ class DbPg(DbBase):
         finally:
             return result
 
-    def get_by(self, table_name: str, parameters: dict[str, Any]) -> list[Any]:
+    def get_by_id(self, table_name: str, id: int) -> list[Any]:
         result: list[Any] = []
         try:
             if self.connection is None:
                 self.conenct()
 
-            parameters_query: str = ""
-
-            for par in parameters.keys():
-                parameters_query += " AND ".join(list([f"{par}={parameters.get(par)}"]))
-                print(par)
-
             query_str: str = f"""SELECT * FROM "fastapi"."{table_name}" 
-                                WHERE {parameters_query}"""
+                                WHERE "id"={id}"""
 
             cursor = self.connection.cursor()
             cursor.execute(query_str)
