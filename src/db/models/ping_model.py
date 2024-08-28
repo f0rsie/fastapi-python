@@ -15,6 +15,6 @@ class PingModel(ModelBase):
 
     def get_fields(self) -> list[Any]:
         return super().get_fields()
-    
+
     def get_values(self) -> list[Any]:
         return super().get_values()

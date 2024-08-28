@@ -78,20 +78,37 @@ class DbPg(DbBase):
         finally:
             return result
 
-    def delete_by(self, table_name: str, parameters: dict[str, Any]) -> bool:
+    def delete_by_id(self, table_name: str, id: int) -> bool:
         result: bool = False
         try:
             if self.connection is None:
                 self.conenct()
 
-            parameters_query: str = ""
+            query_str: str = f"""DELETE FROM "fastapi"."{table_name}" 
+                                WHERE "id"={id}"""
 
-            for par in parameters.keys():
-                parameters_query += " AND ".join(list([f"{par}={parameters.get(par)}"]))
-                print(par)
+            cursor = self.connection.cursor()
+            cursor.execute(query_str)
+
+            self.connection.commit()
+            cursor.close()
+
+            result = True
+
+        except Exception as ex:
+            print(ex)
+
+        finally:
+            return result
+
+    def delete_by_sql_params(self, table_name: str, sql_params: str) -> bool:
+        result: bool = False
+        try:
+            if self.connection is None:
+                self.conenct()
 
             query_str: str = f"""DELETE FROM "fastapi"."{table_name}" 
-                                WHERE {parameters_query}"""
+                                WHERE {sql_params}"""
 
             cursor = self.connection.cursor()
             cursor.execute(query_str)

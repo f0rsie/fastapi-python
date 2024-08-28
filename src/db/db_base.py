@@ -21,5 +21,9 @@ class DbBase(ABC):
         pass
 
     @abstractmethod
-    def delete_by(self, table_name: str, parameters: dict[str, Any]) -> bool:
+    def delete_by_id(self, table_name: str, id: int) -> bool:
+        pass
+
+    @abstractmethod
+    def delete_by_sql_params(self, table_name: str, sql_params: str) -> bool:
         pass

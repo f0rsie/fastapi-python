@@ -6,12 +6,13 @@ from db.models.ping_model import PingModel
 from db.models.model_base import ModelBase
 from utils import read_file, check_ping, async_read_file, async_check_ping
 
+
 # TODO: make controller for this dao
 class ResultDAO(DaoBase):
 
     def __init__(self, db: DbBase, path_file: str):
         self.db: DbBase = db
-        self.path_file: str = path_file #TODO: посмотри работу с файлами на питоне
+        self.path_file: str = path_file  # TODO: посмотри работу с файлами на питоне
 
     def add_data_to_db(self, table: ModelBase) -> bool:
         result: bool = False
@@ -27,7 +28,7 @@ class ResultDAO(DaoBase):
     def get_all_data_from_db(self) -> list[ModelBase]:
         result: list[ModelBase] = []
         try:
-            result = self.db.get_all("pings") 
+            result = self.db.get_all("pings")
 
         except Exception as ex:
             print(ex)
@@ -35,23 +36,21 @@ class ResultDAO(DaoBase):
         finally:
             return result
 
-    def delete_by_id(self, parameter: Any) -> bool:
+    def delete_by_id(self, id: int) -> bool:
         result: bool = False
         try:
-            dictionary: dict[str, Any] = {"id": parameter}
-            result = self.db.delete_by("pings", dictionary)
+            result = self.db.delete_by_id("pings", id)
 
         except Exception as ex:
             print(ex)
 
         finally:
             return result
-        
-    def delete_by(self, params: tuple[Any]) -> bool:
+
+    def delete_by_sql_params(self, table_name: str, sql_params: str) -> bool:
         result: bool = False
         try:
-            dictionary: dict[str, Any] = params.__dict__
-            result = self.db.delete_by("pings", dictionary)
+            result = self.db.delete_by_sql_params(table_name, sql_params)
 
         except Exception as ex:
             print(ex)
@@ -67,7 +66,7 @@ class ResultDAO(DaoBase):
 
         except Exception as ex:
             print(ex)
-            
+
         finally:
             return result
 
@@ -99,7 +98,6 @@ class ResultDAO(DaoBase):
 
         finally:
             return result
-        
 
     async def async_check_pings(self) -> list[PingModel]:
         result: list[PingModel] = []

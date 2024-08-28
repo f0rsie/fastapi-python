@@ -1,9 +1,13 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Query
+from typing import Annotated
+from pydantic import BaseModel
+
 
 from dao.result_dao import ResultDAO
 from dao.dao_base import DaoBase
 from db.db_pg import DbPg
 from db.models.model_base import ModelBase
+from models.base_models.pings_base_model import PingsBaseModel
 
 result_router = APIRouter()
 
@@ -47,9 +51,18 @@ def get_by_id(id: int):
 def delete_by_id(id: int):
     try:
         result: bool = dao_model.delete_by_id(id)
-        #result: bool = dao_model.delete_by(tuple([id, avail]))
 
         return result
 
+    except Exception as ex:
+        return ex
+
+
+@result_router.delete("/delete-by-sql-params/")
+def delete_by_sql_params(table: str, sql_params: str):
+    try:
+        result: bool = dao_model.delete_by_sql_params("pings", sql_params)
+
+        return result
     except Exception as ex:
         return ex

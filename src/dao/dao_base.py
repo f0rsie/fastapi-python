@@ -15,7 +15,7 @@ class DaoBase(ABC):
         pass
 
     @abstractmethod
-    def delete_by(self, params: tuple[Any]) -> bool:
+    def delete_by_sql_params(self, table_name: str, sql_params: str) -> bool:
         pass
 
     @abstractmethod
