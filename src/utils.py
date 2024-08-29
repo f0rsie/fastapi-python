@@ -1,58 +1,63 @@
 import os
 import re
+from typing import Any
 import aiofiles
 import datetime
 import aioping
-import math
 
 from db.models.ping_model import PingModel
+from exceptions.handlers import utils_handler
+from icmplib import ping
+from icmplib.exceptions import DestinationUnreachable, NameLookupError
 
 
+# TODO: Перенести result: PingModel в сигнатуру функции, чтобы в дальнейшем перенести все except в handlers (decorator)
+@utils_handler
 def check_ping(url):
-    result = PingModel()
-    result.time = datetime.datetime.now().strftime("%m/%d/%Y-%H-%M-%S")
-    result.url = url
-
-    full_string: str = os.popen(f"ping -c 1 {url}").read()
-    compact_string: re.Match[str] | None = re.search(r"(time=).*.ms", full_string)
-
-    if compact_string is not None:
-        unformatted_ping = re.search(r"\d+.\d+", compact_string.group())
-
-        if unformatted_ping is not None:
-            result.ping = unformatted_ping.group(0)
-            result.is_available = True
-
-        else:
-            result.is_available = False
-            result.ping = "NaN"
-    else:
-        result.is_available = False
-        result.ping = "NaN"
-
-    return result
-
-
-async def async_check_ping(url) -> PingModel:
-    result = PingModel()
     try:
-        result.time = datetime.datetime.now().strftime("%d/%m/%Y-%H-%M-%S")
+        result = PingModel()
+        result.time = datetime.datetime.now().strftime("%m/%d/%Y-%H-%M-%S")
         result.url = url
 
-        delay = await aioping.ping(url, timeout=1) * 1000
+        host = ping(url, 2, 1)
+        result.ping = str(round(host.avg_rtt, 2))
+        result.is_available = True
+
+        return result
+    except DestinationUnreachable:
+        result.ping = "NaN"
+        result.is_available = False
+
+        return result
+    except NameLookupError:
+        result.ping = "NaN"
+        result.is_available = False
+
+        return result
+
+
+@utils_handler
+async def async_check_ping(url) -> PingModel:
+    try:
+        result = PingModel()
+        result.time = datetime.datetime.now().strftime("%m/%d/%Y-%H-%M-%S")
+        result.url = url
+
+        delay: Any = await aioping.ping(url, timeout=3) * 1000
 
         result.ping = round(delay, 2)
         result.is_available = True
 
-    except Exception as ex:
-        print(ex)
+        return result
+
+    except Exception:
         result.ping = "NaN"
         result.is_available = False
 
-    finally:
         return result
 
 
+@utils_handler
 def read_file(filename):
     lines_result: list[str] = []
     with open(filename, mode="r") as file:
@@ -62,6 +67,7 @@ def read_file(filename):
     return lines_result
 
 
+@utils_handler
 async def async_read_file(filename):
     lines_result: list[str] = []
     async with aiofiles.open(filename, mode="r") as file:

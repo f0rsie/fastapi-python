@@ -1,68 +1,52 @@
-from fastapi import APIRouter, Query
-from typing import Annotated
-from pydantic import BaseModel
-
-
-from dao.result_dao import ResultDAO
+from typing import Any
 from dao.dao_base import DaoBase
+from dao.result_dao import ResultDAO
 from db.db_pg import DbPg
 from db.models.model_base import ModelBase
-from models.base_models.pings_base_model import PingsBaseModel
-
-result_router = APIRouter()
-
-dao_model: DaoBase = ResultDAO(DbPg(), "files/urls.txt")
+from db.models.ping_model import PingModel
+from exceptions.handlers import controllers_handler
+from utils import async_check_ping, async_read_file, check_ping, read_file
 
 
-@result_router.get("/test")
-def test():
-    try:
-        result: list[ModelBase] = dao_model.check_and_save()
+class ResultController:
 
-        return result
+    @controllers_handler
+    def __init__(self):
+        self.path_file: str = "files/urls.txt"
+        self.result_dao: DaoBase = ResultDAO(DbPg())
 
-    except Exception as ex:
-        return ex
+    @controllers_handler
+    def get_by_id_func(self, table: str, id: int) -> Any:
+        return self.result_dao.get_data_by_id(table, id)
 
+    @controllers_handler
+    def delete_by_id_func(self, table: str, id: int) -> bool:
+        return self.result_dao.delete_by_id(table, id)
 
-@result_router.get("/a-test")
-async def async_test():
-    try:
-        result: list[ModelBase] = await dao_model.async_check_and_save()
+    @controllers_handler
+    def delete_by_sql_params_func(self, table: str, sql_params: str) -> bool:
+        return self.result_dao.delete_by_sql_params(table, sql_params)
 
-        return result
+    @controllers_handler
+    def test_func(self, table_name: str = "pings") -> list[PingModel]:
+        result: list[PingModel] = []
+        url_list: list[str] = read_file(self.path_file)
 
-    except Exception as ex:
-        return ex
-
-
-@result_router.get("/{id}")
-def get_by_id(table: str, id: int):
-    try:
-        result: list[ModelBase] = dao_model.get_data_by_id(table, id)
-
-        return result
-
-    except Exception as ex:
-        return ex
-
-
-@result_router.delete("/delete/{id}")
-def delete_by_id(table: str, id: int):
-    try:
-        result: bool = dao_model.delete_by_id(table, id)
+        for url in url_list:
+            url_PingModel: PingModel = check_ping(url)
+            self.result_dao.add_data_to_db(table_name, url_PingModel)
+            result.append(url_PingModel)
 
         return result
 
-    except Exception as ex:
-        return ex
+    @controllers_handler
+    async def async_test_func(self, table_name: str = "pings") -> list[PingModel]:
+        result: list[PingModel] = []
+        url_list: list[str] = await async_read_file(self.path_file)
 
-
-@result_router.delete("/delete-by-sql-params/")
-def delete_by_sql_params(table: str, sql_params: str):
-    try:
-        result: bool = dao_model.delete_by_sql_params(table, sql_params)
+        for url in url_list:
+            url_PingModel: PingModel = await async_check_ping(url)
+            self.result_dao.add_data_to_db(table_name, url_PingModel)
+            result.append(url_PingModel)
 
         return result
-    except Exception as ex:
-        return ex

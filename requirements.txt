@@ -3,3 +3,4 @@ uvicorn
 aiofiles
 psycopg2-binary
 aioping
+icmplib

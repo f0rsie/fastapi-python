@@ -3,142 +3,114 @@ import psycopg2
 import os
 from db.db_base import DbBase
 from db.models.model_base import ModelBase
+from exceptions.handlers import db_handler
 
 
 class DbPg(DbBase):
     conenction = None
 
+    @db_handler
     def __init__(self):
-        try:
+        self.conenct()
+
+    @db_handler
+    def conenct(self):
+        self.connection = psycopg2.connect(
+            dbname=os.environ["POSTGRES_DB"],
+            host=os.environ["DB_HOST"],
+            user=os.environ["POSTGRES_USER"],
+            password=os.environ["POSTGRES_PASSWORD"],
+            port=os.environ["DB_PORT"],
+        )
+
+    @db_handler
+    def get_all(self, table_name: str) -> list[Any]:
+        if self.connection is None:
             self.conenct()
 
-        except Exception as ex:
-            print(ex)
+        query_str: str = f"""SELECT * FROM "fastapi"."{table_name}"""
 
-    def conenct(self):
-        try:
-            connection = psycopg2.connect(
-                dbname=os.environ["POSTGRES_DB"],
-                host=os.environ["DB_HOST"],
-                user=os.environ["POSTGRES_USER"],
-                password=os.environ["POSTGRES_PASSWORD"],
-                port=os.environ["DB_PORT"],
-            )
-            self.connection = connection
+        cursor = self.connection.cursor()
+        cursor.execute(query_str)
 
-        except Exception as ex:
-            print(ex)
+        result = cursor.fetchall()
 
-    def get_all(self, table_name: str) -> list[ModelBase]:
-        result: list[ModelBase] = []
-        try:
-            if self.connection is None:
-                self.conenct()
+        self.connection.commit()
+        cursor.close()
 
-            query_str: str = f"""SELECT * FROM "fastapi"."{table_name}"""
+        return result
 
-            cursor = self.connection.cursor()
-            cursor.execute(query_str)
+    @db_handler
+    def get_by_id(self, table_name: str, id: int) -> Any:
+        if self.connection is None:
+            self.conenct()
 
-            records = cursor.fetchone()
-            print(records)
-            self.connection.commit()
-            cursor.close()
+        query_str: str = f"""SELECT * FROM "fastapi"."{table_name}" 
+                            WHERE "id"={id}"""
 
-        except Exception as ex:
-            print(ex)
+        cursor = self.connection.cursor()
+        cursor.execute(query_str)
 
-        finally:
-            return result
+        result = cursor.fetchone()
 
-    def get_by_id(self, table_name: str, id: int) -> list[Any]:
-        result: list[Any] = []
-        try:
-            if self.connection is None:
-                self.conenct()
+        self.connection.commit()
+        cursor.close()
 
-            query_str: str = f"""SELECT * FROM "fastapi"."{table_name}" 
-                                WHERE "id"={id}"""
+        return result
 
-            cursor = self.connection.cursor()
-            cursor.execute(query_str)
-
-            result = cursor.fetchall()
-
-            self.connection.commit()
-            cursor.close()
-
-        except Exception as ex:
-            print(ex)
-
-        finally:
-            return result
-
+    @db_handler
     def delete_by_id(self, table_name: str, id: int) -> bool:
         result: bool = False
-        try:
-            if self.connection is None:
-                self.conenct()
+        if self.connection is None:
+            self.conenct()
 
-            query_str: str = f"""DELETE FROM "fastapi"."{table_name}" 
-                                WHERE "id"={id}"""
+        query_str: str = f"""DELETE FROM "fastapi"."{table_name}" 
+                            WHERE "id"={id}"""
 
-            cursor = self.connection.cursor()
-            cursor.execute(query_str)
+        cursor = self.connection.cursor()
+        cursor.execute(query_str)
 
-            self.connection.commit()
-            cursor.close()
+        self.connection.commit()
+        cursor.close()
 
-            result = True
+        result = True
 
-        except Exception as ex:
-            print(ex)
+        return result
 
-        finally:
-            return result
-
+    @db_handler
     def delete_by_sql_params(self, table_name: str, sql_params: str) -> bool:
         result: bool = False
-        try:
-            if self.connection is None:
-                self.conenct()
+        if self.connection is None:
+            self.conenct()
 
-            query_str: str = f"""DELETE FROM "fastapi"."{table_name}" 
-                                WHERE {sql_params}"""
+        query_str: str = f"""DELETE FROM "fastapi"."{table_name}" 
+                            WHERE {sql_params}"""
 
-            cursor = self.connection.cursor()
-            cursor.execute(query_str)
+        cursor = self.connection.cursor()
+        cursor.execute(query_str)
 
-            self.connection.commit()
-            cursor.close()
+        self.connection.commit()
+        cursor.close()
 
-            result = True
+        result = True
 
-        except Exception as ex:
-            print(ex)
+        return result
 
-        finally:
-            return result
-
+    @db_handler
     def add_to(self, table_name: str, table: ModelBase) -> bool:
         result: bool = False
-        try:
-            if self.connection is None:
-                self.conenct()
+        if self.connection is None:
+            self.conenct()
 
-            query_str: str = f"""INSERT INTO "fastapi"."{table_name}"({", ".join(map(str, tuple(table.get_fields())))}) 
-                                VALUES {tuple(table.get_values())}"""
+        query_str: str = f"""INSERT INTO "fastapi"."{table_name}"({", ".join(map(str, tuple(table.get_fields())))}) 
+                            VALUES {tuple(table.get_values())}"""
 
-            cursor = self.connection.cursor()
-            cursor.execute(query_str)
+        cursor = self.connection.cursor()
+        cursor.execute(query_str)
 
-            self.connection.commit()
-            cursor.close()
+        self.connection.commit()
+        cursor.close()
 
-            result = True
+        result = True
 
-        except Exception as ex:
-            print(ex)
-
-        finally:
-            return result
+        return result

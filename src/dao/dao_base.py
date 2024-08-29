@@ -7,11 +7,11 @@ from db.models.model_base import ModelBase
 
 class DaoBase(ABC):
     @abstractmethod
-    def add_data_to_db(self, table: ModelBase) -> bool:
+    def add_data_to_db(self, table_name: str, data: ModelBase) -> bool:
         pass
 
     @abstractmethod
-    def get_all_data_from_db(self, table_name: str) -> list[ModelBase]:
+    def get_all_data_from_db(self, table_name: str) -> list[Any]:
         pass
 
     @abstractmethod
@@ -23,21 +23,5 @@ class DaoBase(ABC):
         pass
 
     @abstractmethod
-    def get_data_by_id(self, table_name: str, id: int) -> list[ModelBase]:
-        pass
-
-    @abstractmethod
-    def check_pings(self) -> list[PingModel]:
-        pass
-
-    @abstractmethod
-    def check_and_save(self) -> list[ModelBase]:
-        pass
-
-    @abstractmethod
-    async def async_check_pings(self) -> list[PingModel]:
-        pass
-
-    @abstractmethod
-    async def async_check_and_save(self) -> list[ModelBase]:
+    def get_data_by_id(self, table_name: str, id: int) -> Any:
         pass

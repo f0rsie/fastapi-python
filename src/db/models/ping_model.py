@@ -1,3 +1,4 @@
+from json import JSONEncoder
 from typing import Any
 
 from db.models.model_base import ModelBase

@@ -9,11 +9,11 @@ class DbBase(ABC):
         pass
 
     @abstractmethod
-    def get_all(self, table_name: str) -> list[ModelBase]:
+    def get_all(self, table_name: str) -> list[Any]:
         pass
 
     @abstractmethod
-    def get_by_id(self, table_name: str, id: int) -> list[Any]:
+    def get_by_id(self, table_name: str, id: int) -> Any:
         pass
 
     @abstractmethod
