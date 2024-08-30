@@ -1,49 +1,65 @@
 from typing import Any
 from fastapi import APIRouter
-from fastapi.responses import JSONResponse, Response
+from fastapi.responses import JSONResponse
+from fastapi.encoders import jsonable_encoder
 
-from db.models.model_base import ModelBase
 from controllers.result_controller import ResultController
 from db.models.ping_model import PingModel
-from exceptions.handlers import routers_handler
+from exceptions.handlers import routers_handler, logging_dec
+
 
 try:
     result_router = APIRouter()
-    result_controller = ResultController()
-except:
-    pass
+    result_controller: ResultController = ResultController()
+except BaseException as ex:
+    raise ex
 
 
-@routers_handler
 @result_router.get("/test")
+@routers_handler
+@logging_dec
 def test():
     result: list[PingModel] = result_controller.test_func()
-    return result
+    json_result = jsonable_encoder(result)
+    return JSONResponse(json_result)
 
 
-@routers_handler
 @result_router.get("/a-test")
+@routers_handler
+@logging_dec
 async def async_test():
     result: list[PingModel] = await result_controller.async_test_func()
-    return result
+    json_result = jsonable_encoder(result)
+    return JSONResponse(json_result)
 
 
+@result_router.get("/get-all")
 @routers_handler
+async def async_get_all(table: str):
+    result = await result_controller.get_all_func(table)
+    json_result = jsonable_encoder(result)
+    return JSONResponse(json_result)
+
+
 @result_router.get("/by-id")
-def get_by_id(table: str, id: int):
+@routers_handler
+async def get_by_id(table: str, id: int):
     result: Any = result_controller.get_by_id_func(table, id)
-    return JSONResponse(result)
+    json_result = jsonable_encoder(result)
+    return JSONResponse(json_result)
 
 
-@routers_handler
 @result_router.delete("/delete")
-def delete_by_id(table: str, id: int):
-    result: bool = result_controller.delete_by_id_func(table, id)
-    return JSONResponse(result)
-
-
 @routers_handler
+async def delete_by_id(table: str, id: int):
+    result: bool = result_controller.delete_by_id_func(table, id)
+    json_result = jsonable_encoder(result)
+    return JSONResponse(json_result)
+
+
 @result_router.delete("/delete-by-sql-params")
-def delete_by_sql_params(table: str, sql_params: str):
+@routers_handler
+async def delete_by_sql_params(table: str, sql_params: str):
     result: bool = result_controller.delete_by_sql_params_func(table, sql_params)
-    return JSONResponse(result)
+    json_result = jsonable_encoder(result)
+    return JSONResponse(json_result)

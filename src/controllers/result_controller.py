@@ -1,11 +1,14 @@
 from typing import Any
 from dao.dao_base import DaoBase
 from dao.result_dao import ResultDAO
-from db.db_pg import DbPg
-from db.models.model_base import ModelBase
 from db.models.ping_model import PingModel
 from exceptions.handlers import controllers_handler
-from utils import async_check_ping, async_read_file, check_ping, read_file
+from utils import (
+    async_read_file,
+    check_pings,
+    read_file,
+    async_check_pings,
+)
 
 
 class ResultController:
@@ -13,7 +16,11 @@ class ResultController:
     @controllers_handler
     def __init__(self):
         self.path_file: str = "files/urls.txt"
-        self.result_dao: DaoBase = ResultDAO(DbPg())
+        self.result_dao: DaoBase = ResultDAO()
+
+    @controllers_handler
+    async def get_all_func(self, table: str) -> list[Any]:
+        return []
 
     @controllers_handler
     def get_by_id_func(self, table: str, id: int) -> Any:
@@ -29,24 +36,20 @@ class ResultController:
 
     @controllers_handler
     def test_func(self, table_name: str = "pings") -> list[PingModel]:
-        result: list[PingModel] = []
-        url_list: list[str] = read_file(self.path_file)
+        urls_list: list[str] = read_file(self.path_file)
+        result: list[PingModel] = check_pings(urls_list)
 
-        for url in url_list:
-            url_PingModel: PingModel = check_ping(url)
-            self.result_dao.add_data_to_db(table_name, url_PingModel)
-            result.append(url_PingModel)
+        for ping_model in result:
+            self.result_dao.add_data_to_db(table_name, ping_model)
 
         return result
 
     @controllers_handler
     async def async_test_func(self, table_name: str = "pings") -> list[PingModel]:
-        result: list[PingModel] = []
-        url_list: list[str] = await async_read_file(self.path_file)
+        urls_list: list[str] = await async_read_file(self.path_file)
+        result: list[PingModel] = await async_check_pings(urls_list)
 
-        for url in url_list:
-            url_PingModel: PingModel = await async_check_ping(url)
-            self.result_dao.add_data_to_db(table_name, url_PingModel)
-            result.append(url_PingModel)
+        for ping_model in result:
+            self.result_dao.add_data_to_db(table_name, ping_model)
 
         return result

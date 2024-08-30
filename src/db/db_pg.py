@@ -7,7 +7,8 @@ from exceptions.handlers import db_handler
 
 
 class DbPg(DbBase):
-    conenction = None
+
+    connection: Any
 
     @db_handler
     def __init__(self):
@@ -45,8 +46,7 @@ class DbPg(DbBase):
         if self.connection is None:
             self.conenct()
 
-        query_str: str = f"""SELECT * FROM "fastapi"."{table_name}" 
-                            WHERE "id"={id}"""
+        query_str: str = f"""SELECT * FROM "fastapi"."{table_name}" WHERE "id"={id}"""
 
         cursor = self.connection.cursor()
         cursor.execute(query_str)

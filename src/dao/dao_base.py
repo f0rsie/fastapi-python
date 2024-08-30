@@ -1,7 +1,6 @@
 from abc import ABC, abstractmethod
 from typing import Any
 
-from db.models.ping_model import PingModel
 from db.models.model_base import ModelBase
 
 

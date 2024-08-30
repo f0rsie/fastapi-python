@@ -1,21 +1,13 @@
-from json import JSONEncoder
-from typing import Any
-
 from db.models.model_base import ModelBase
 
 
 class PingModel(ModelBase):
     id: int = 0
     url: str = ""
-    is_available: bool = True
-    ping: str = "NaN"
+    is_available: bool
+    ping: str
     time: str = ""
 
     def __init__(self):
-        pass
-
-    def get_fields(self) -> list[Any]:
-        return super().get_fields()
-
-    def get_values(self) -> list[Any]:
-        return super().get_values()
+        self.is_available = False
+        self.ping = "0.0"
