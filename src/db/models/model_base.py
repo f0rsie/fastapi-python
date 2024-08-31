@@ -1,14 +1,13 @@
-from abc import ABC, abstractmethod
 from typing import Any
+import json
 
 
-class ModelBase(ABC):
+class ModelBase:
     id: int
 
-    def __init__(self) -> None:
+    def __init__(self):
         pass
 
-    @abstractmethod
     def get_fields(self) -> list[Any]:
         field_list: list[Any] = []
 
@@ -17,7 +16,6 @@ class ModelBase(ABC):
 
         return field_list
 
-    @abstractmethod
     def get_values(self) -> list[Any]:
         values_list: list[Any] = []
 
@@ -25,3 +23,6 @@ class ModelBase(ABC):
             values_list.append(self.__dict__.get(value))
 
         return values_list
+
+    def to_json(self):
+        return json.dumps(self, default=lambda o: o.__dict__)

@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 import uvicorn
-from controllers.result_controller import result_router
+from routers.result_router import result_router
 
 app = FastAPI()
 app.include_router(result_router, prefix="/test")
