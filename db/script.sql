@@ -5,6 +5,5 @@ CREATE TABLE "fastapi"."pings" (
     "id" INTEGER PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
     "url" VARCHAR(50) NOT NULL,
     "is_available" BOOLEAN NOT NULL,
-    "ping" VARCHAR(50) NOT NULL,
-    "time" VARCHAR(60) NOT NULL
+    "ping" VARCHAR(50) NOT NULL
 )

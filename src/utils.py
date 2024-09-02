@@ -1,7 +1,8 @@
+import os
 import aiofiles
 from icmplib.models import Host
 
-from db.models.ping_model import PingModel
+from db.models.alchemy_models import PingModel
 from exceptions.handlers import logging_dec, utils_handler
 from icmplib import async_resolve, resolve, async_multiping, multiping
 from icmplib.exceptions import NameLookupError
@@ -13,15 +14,15 @@ def check_pings(urls: list[str]) -> list[PingModel]:
 
     valid_urls: list[str] = url_validation(urls)
 
-    host_list: list[Host] = multiping(valid_urls, 2, 1, privileged=True)
+    root_privileged: bool = bool(os.environ["ROOT_PRIVILEGED"].lower() == "true")
+    host_list: list[Host] = multiping(valid_urls, 2, 1, privileged=root_privileged)
 
     dictionary = dict(zip(valid_urls, host_list))
 
     for elem in dictionary:
         ping_model = PingModel()
         ping_model.url = elem
-        ping_model.time = "0"
-        ping_model.ping = str(dictionary[elem].avg_rtt)
+        ping_model.ping = str(round(dictionary[elem].avg_rtt, 2))
         ping_model.is_available = dictionary[elem].is_alive
 
         results.append(ping_model)
@@ -31,7 +32,8 @@ def check_pings(urls: list[str]) -> list[PingModel]:
     for url in unvalid_urls:
         ping_model = PingModel()
         ping_model.url = url
-        ping_model.time = "0"
+        ping_model.ping = "NaN"
+        ping_model.is_available = False
 
         results.append(ping_model)
 
@@ -44,15 +46,17 @@ async def async_check_pings(urls: list[str]) -> list[PingModel]:
 
     valid_urls: list[str] = await async_url_validation(urls)
 
-    host_list: list[Host] = await async_multiping(valid_urls, 2, 1, privileged=True)
+    root_privileged: bool = bool(os.environ["ROOT_PRIVILEGED"].lower() == "true")
+    host_list: list[Host] = await async_multiping(
+        valid_urls, 2, 1, privileged=root_privileged
+    )
 
     dictionary = dict(zip(valid_urls, host_list))
 
     for elem in dictionary:
         ping_model = PingModel()
         ping_model.url = elem
-        ping_model.time = "0"
-        ping_model.ping = str(dictionary[elem].avg_rtt)
+        ping_model.ping = str(round(dictionary[elem].avg_rtt, 2))
         ping_model.is_available = dictionary[elem].is_alive
 
         results.append(ping_model)
@@ -62,7 +66,8 @@ async def async_check_pings(urls: list[str]) -> list[PingModel]:
     for url in unvalid_urls:
         ping_model = PingModel()
         ping_model.url = url
-        ping_model.time = "0"
+        ping_model.ping = "0.0"
+        ping_model.is_available = False
 
         results.append(ping_model)
 

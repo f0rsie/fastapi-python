@@ -4,3 +4,5 @@ aiofiles
 psycopg2-binary
 aioping
 icmplib
+SQLAlchemy
+asyncpg
