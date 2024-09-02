@@ -15,7 +15,7 @@ class ResultController:
 
     @controllers_handler
     def __init__(self):
-        self.path_file: str = "src/files/urls.txt"
+        self.path_file: str = "files/urls.txt"
         self.result_dao: DaoBase = ResultDAO()
 
     @controllers_handler

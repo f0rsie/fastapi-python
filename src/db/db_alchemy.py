@@ -1,7 +1,6 @@
 import os
 from typing import Any
 
-from line_profiler import profile
 from sqlalchemy import Engine, create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.engine import URL
@@ -37,12 +36,7 @@ class DbAlchemy(DbBase):
         )
 
         self.async_engine: AsyncEngine = create_async_engine(self._async_config)
-
-    @db_handler
-    def create_connection(self):
         self.engine: Engine = create_engine(self._config)
-        self.session = sessionmaker(autoflush=False, bind=self.engine)
-        self.engine.connect()
 
     @db_handler
     def get_all(self, table) -> list[Any]:
@@ -50,22 +44,24 @@ class DbAlchemy(DbBase):
 
     @db_handler
     def get_by_id(self, table, id: int) -> Any:
-        with self.session() as db:
-            result: Any = db.query(table).where(table.id == id).first()
+        session = sessionmaker(autoflush=False, bind=self.engine)
+        with self.engine.connect():
+            with session() as db:
+                result: Any = db.query(table).where(table.id == id).first()
 
-            if result is None:
-                raise Exception("User not found")
+                if result is None:
+                    raise Exception("User not found")
 
-            return result
+                return result
 
     @db_handler
-    @profile
     def add_to(self, table, data):
-        self.create_connection()
-        with self.session() as db:
+        session = sessionmaker(autoflush=False, bind=self.engine)
+        with session() as db:
             db.add(data)
             db.commit()
 
+    @db_handler
     async def add_many_to(self, data):
         async_session = async_sessionmaker(autoflush=False, bind=self.async_engine)
         async with self.async_engine.connect():
