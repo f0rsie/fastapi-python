@@ -8,8 +8,6 @@ RUN pip install -r requirements.txt
 
 COPY src/ ./src/
 
-WORKDIR /app/src
-
 EXPOSE 8000
 
 #ENTRYPOINT [ "python", "main.py" ]

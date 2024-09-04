@@ -1,18 +1,10 @@
-from dataclasses import dataclass
-from sqlalchemy.orm import DeclarativeBase
-from sqlalchemy import String
-from sqlalchemy.orm import DeclarativeBase
+from sqlalchemy import MetaData, String
 from sqlalchemy.orm import Mapped
 from sqlalchemy.orm import mapped_column
 
+from models.base_model import BaseModel
 
-@dataclass
-class ModelBase(DeclarativeBase):
-    pass
-
-
-@dataclass
-class PingModel(ModelBase):
+class PingModel(BaseModel):
     __tablename__ = "pings"
     __table_args__ = {"schema": "fastapi"}
 

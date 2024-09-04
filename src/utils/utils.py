@@ -1,21 +1,20 @@
-import os
 import aiofiles
 from icmplib.models import Host
 
-from db.models.alchemy_models import PingModel
-from exceptions.handlers import logging_dec, utils_handler
 from icmplib import async_resolve, resolve, async_multiping, multiping
 from icmplib.exceptions import NameLookupError
 
+from core.config import settings
 
-@utils_handler
+from models.ping_model import PingModel
+
+
 def check_pings(urls: list[str]) -> list[PingModel]:
     results: list[PingModel] = []
 
     valid_urls: list[str] = url_validation(urls)
 
-    root_privileged: bool = bool(os.environ["ROOT_PRIVILEGED"].lower() == "true")
-    host_list: list[Host] = multiping(valid_urls, 2, 1, privileged=root_privileged)
+    host_list: list[Host] = multiping(valid_urls, 2, 1, privileged=settings.ROOT_PRIVILEGED)
 
     dictionary = dict(zip(valid_urls, host_list))
 
@@ -40,15 +39,13 @@ def check_pings(urls: list[str]) -> list[PingModel]:
     return results
 
 
-@utils_handler
 async def async_check_pings(urls: list[str]) -> list[PingModel]:
     results: list[PingModel] = []
 
     valid_urls: list[str] = await async_url_validation(urls)
 
-    root_privileged: bool = bool(os.environ["ROOT_PRIVILEGED"].lower() == "true")
     host_list: list[Host] = await async_multiping(
-        valid_urls, 2, 1, privileged=root_privileged
+        valid_urls, 2, 1, privileged=settings.ROOT_PRIVILEGED
     )
 
     dictionary = dict(zip(valid_urls, host_list))
@@ -74,7 +71,6 @@ async def async_check_pings(urls: list[str]) -> list[PingModel]:
     return results
 
 
-@utils_handler
 def url_validation(urls: list[str]) -> list[str]:
     results: list[str] = []
 
@@ -88,7 +84,6 @@ def url_validation(urls: list[str]) -> list[str]:
     return results
 
 
-@utils_handler
 async def async_url_validation(urls: list[str]) -> list[str]:
     results: list[str] = []
 
@@ -102,7 +97,6 @@ async def async_url_validation(urls: list[str]) -> list[str]:
     return results
 
 
-@utils_handler
 def read_file(filename):
     lines_result: list[str] = []
     with open(filename, mode="r") as file:
@@ -112,7 +106,6 @@ def read_file(filename):
     return lines_result
 
 
-@utils_handler
 async def async_read_file(filename):
     lines_result: list[str] = []
     async with aiofiles.open(filename, mode="r") as file:

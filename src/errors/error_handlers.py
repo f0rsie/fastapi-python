@@ -3,8 +3,6 @@ import asyncio
 import time
 from fastapi.responses import JSONResponse
 from psycopg2 import OperationalError
-from exceptions.db_exceptions import DbUnavailableError
-from exceptions.utils_exceptions import UrlFileNotFound
 from icmplib.exceptions import SocketPermissionError
 
 import logging
@@ -20,7 +18,7 @@ def utils_handler(func):
         except SocketPermissionError as ex:
             raise ex
         except OSError as ex:
-            raise UrlFileNotFound() from ex
+            raise ex
         except Exception as ex:
             raise ex
 
@@ -31,7 +29,7 @@ def utils_handler(func):
         except SocketPermissionError as ex:
             raise ex
         except OSError as ex:
-            raise UrlFileNotFound() from ex
+            raise ex
         except Exception as ex:
             raise ex
 
@@ -47,7 +45,7 @@ def db_handler(func):
         try:
             return await func(*args, **kwargs)
         except OperationalError as ex:
-            raise DbUnavailableError from ex
+            raise ex
         except Exception as ex:
             raise ex
 
@@ -56,7 +54,7 @@ def db_handler(func):
         try:
             return func(*args, **kwargs)
         except OperationalError as ex:
-            raise DbUnavailableError from ex
+            raise ex
         except Exception as ex:
             raise ex
 
@@ -71,8 +69,6 @@ def dao_handler(func):
     async def async_inner_func(*args, **kwargs):
         try:
             return await func(*args, **kwargs)
-        except DbUnavailableError as ex:
-            raise ex
         except Exception as ex:
             raise ex
 
@@ -80,8 +76,6 @@ def dao_handler(func):
     def inner_func(*args, **kwargs):
         try:
             return func(*args, **kwargs)
-        except DbUnavailableError as ex:
-            raise ex
         except Exception as ex:
             raise ex
 
@@ -96,10 +90,6 @@ def controllers_handler(func):
     async def async_inner_func(*args, **kwargs):
         try:
             return await func(*args, **kwargs)
-        except DbUnavailableError as ex:
-            raise ex
-        except UrlFileNotFound as ex:
-            raise ex
         except Exception as ex:
             raise ex
 
@@ -107,10 +97,6 @@ def controllers_handler(func):
     def inner_func(*args, **kwargs):
         try:
             return func(*args, **kwargs)
-        except DbUnavailableError as ex:
-            raise ex
-        except UrlFileNotFound as ex:
-            raise ex
         except Exception as ex:
             raise ex
 
@@ -125,10 +111,6 @@ def routers_handler(func):
     async def async_inner_func(*args, **kwargs):
         try:
             return await func(*args, **kwargs)
-        except DbUnavailableError:
-            return JSONResponse("Db is not available", status_code=422)
-        except UrlFileNotFound:
-            return JSONResponse("Url file not found", status_code=422)
         except Exception as ex:
             return JSONResponse(str(ex), status_code=500)
 
@@ -136,10 +118,6 @@ def routers_handler(func):
     def inner_func(*args, **kwargs):
         try:
             return func(*args, **kwargs)
-        except DbUnavailableError:
-            return JSONResponse("Db is not available", status_code=422)
-        except UrlFileNotFound:
-            return JSONResponse("Url file not found", status_code=422)
         except Exception as ex:
             return JSONResponse(str(ex), status_code=500)
 

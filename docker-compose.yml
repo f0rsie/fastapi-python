@@ -15,7 +15,7 @@ services:
       ENV: "production"
     ports:
       - "8000:8000"
-    command: ["python", "main.py"]
+    command: ["python", "src/main.py"]
     
   db:
     image: postgres

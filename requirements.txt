@@ -6,3 +6,4 @@ aioping
 icmplib
 SQLAlchemy
 asyncpg
+pydantic_settings
