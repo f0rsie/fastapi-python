@@ -15,7 +15,7 @@ class ResultController:
 
     @controllers_handler
     def __init__(self):
-        self.path_file: str = "files/urls.txt"
+        self.path_file: str = "src/files/urls.txt"
         self.result_dao: DaoBase = ResultDAO()
 
     @controllers_handler
@@ -23,8 +23,8 @@ class ResultController:
         return []
 
     @controllers_handler
-    def get_by_id_func(self, table, id: int) -> Any:
-        return self.result_dao.get_data_by_id(table, id)
+    async def get_by_id_func(self, table, id: int) -> Any:
+        return await self.result_dao.get_data_by_id(table, id)
 
     @controllers_handler
     def delete_by_id_func(self, table, id: int) -> bool:

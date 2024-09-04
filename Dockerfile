@@ -12,4 +12,4 @@ WORKDIR /app/src
 
 EXPOSE 8000
 
-ENTRYPOINT [ "python", "main.py" ]
+#ENTRYPOINT [ "python", "main.py" ]

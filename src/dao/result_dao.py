@@ -33,6 +33,6 @@ class ResultDAO(DaoBase):
         return result
 
     @dao_handler
-    def get_data_by_id(self, table, id: int) -> Any:
-        result: Any = self.db.get_by_id(table, id)
+    async def get_data_by_id(self, table, id: int) -> Any:
+        result: Any = await self.db.get_by_id(table, id)
         return result

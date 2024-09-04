@@ -42,7 +42,7 @@ async def async_get_all(table):
 @result_router.get("/pings/by-id")
 @routers_handler
 async def get_by_id(table, id: int):
-    result: Any = result_controller.get_by_id_func(table, id)
+    result: Any = await result_controller.get_by_id_func(table, id)
     json_result = jsonable_encoder(result)
     return JSONResponse(json_result)
 
