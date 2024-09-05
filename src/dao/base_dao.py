@@ -1,29 +1,29 @@
 from abc import ABC, abstractmethod
 
-from models.base_model import BaseModel
+from pydantic import BaseModel
 
 
 class BaseDAO(ABC):
     @abstractmethod
-    def get_item(self, id: int) -> BaseModel:
+    async def get_item(self, id: str) -> BaseModel:
         pass
 
     @abstractmethod
-    def get_all_items(self) -> list[BaseModel]:
+    async def get_all_items(self) -> list[BaseModel]:
         pass
 
     @abstractmethod
-    def add_item(self, data: BaseModel):
+    async def add_item(self, data: BaseModel):
         pass
 
     @abstractmethod
-    def add_many_items(self, data: list[BaseModel]):
-        pass
-    
-    @abstractmethod
-    def delete_item(self, id: int):
+    async def add_many_items(self, data: list[BaseModel]):
         pass
 
     @abstractmethod
-    def update_item(self, data: BaseModel) -> BaseModel:
+    async def delete_item(self, id: str):
+        pass
+
+    @abstractmethod
+    async def update_item(self, data: BaseModel) -> BaseModel:
         pass

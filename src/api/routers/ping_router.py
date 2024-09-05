@@ -1,67 +1,83 @@
-from typing import Any
+from typing import Any, List
 from fastapi import APIRouter, Depends
 from fastapi.responses import JSONResponse
 from fastapi.encoders import jsonable_encoder
 
+from pydantic import BaseModel
 from sqlalchemy.orm.session import Session
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from core.deps import get_db, async_get_db
 from controllers.ping_controller import PingController
-from models.ping_model import PingModel
-from errors.error_handlers import routers_handler
+
+from errors.error_handlers import router_error_handler
+
+from schemas.ping_schemas import Ping, Result, DeleteResult
+from schemas.errors_schemas import ErrorMessage
 
 
 router = APIRouter()
 
 
-@router.get("/test")
-@routers_handler
+responses: dict[int | str, dict[str, Any]] = {
+    422: {
+        "model": ErrorMessage("User not found in db."),
+        "description": "User not found in db.",
+    },
+    500: {
+        "model": ErrorMessage("Unknown server error."),
+        "description": "Unknown server error.",
+    },
+}
+
+
+@router.get("/test", response_model=Result, responses=responses)
+@router_error_handler
 def test(session: Session = Depends(get_db)):
     ping_controller = PingController(session)
 
-    result: list[PingModel] = ping_controller.test_func()
+    result: Result = ping_controller.test_func()
 
     json_result = jsonable_encoder(result)
     return JSONResponse(json_result)
 
 
-@router.get("/a-test")
-@routers_handler
+@router.get("/a-test", response_model=Result, responses=responses)
+@router_error_handler
 async def async_test(session: AsyncSession = Depends(async_get_db)):
     ping_controller = PingController(session)
 
-    result: list[Any] = await ping_controller.async_test_func()
+    result: Result = await ping_controller.async_test_func()
 
     json_result = jsonable_encoder(result)
     return JSONResponse(json_result)
 
 
-@router.get("/pings/get-all")
-@routers_handler
+@router.get("/pings/get-all", response_model=List[Ping], responses=responses)
+@router_error_handler
 async def async_get_all(session: AsyncSession = Depends(async_get_db)):
     ping_controller = PingController(session)
 
-    result: list[PingModel] = await ping_controller.get_all_func()
+    result: list[Ping] = await ping_controller.get_all_func()
 
     json_result = jsonable_encoder(result)
     return JSONResponse(json_result)
 
 
-@router.get("/pings/by-id")
-@routers_handler
-async def get_by_id(id: int, session: AsyncSession = Depends(async_get_db)):
+@router.get("/pings/by-id", response_model=Ping, responses=responses)
+@router_error_handler
+async def async_get_by_id(id: str, session: AsyncSession = Depends(async_get_db)):
     ping_controller = PingController(session)
 
-    result: PingModel = await ping_controller.get_by_id_func(id)
+    result: Ping = await ping_controller.get_by_id_func(id)
 
     json_result = jsonable_encoder(result)
     return JSONResponse(json_result)
 
 
-@router.delete("/pings/delete")
-@routers_handler
-async def delete_by_id(id: int, session: AsyncSession = Depends(async_get_db)):
+@router.delete("/pings/delete", response_model=DeleteResult, responses=responses)
+@router_error_handler
+async def async_delete_by_id(id: str, session: AsyncSession = Depends(async_get_db)):
     ping_controller = PingController(session)
 
     result = await ping_controller.delete_by_id_func(id)

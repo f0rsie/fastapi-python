@@ -1,29 +1,29 @@
 from abc import ABC, abstractmethod
 
-from models.base_model import BaseModel
+from models.db.base_orm_model import BaseOrmModel
 
 
 class BaseCrud(ABC):
     @abstractmethod
-    def get_item_by_id(self, id: int) -> BaseModel:
+    async def get_item_by_id(self, id: str) -> BaseOrmModel:
         pass
 
     @abstractmethod
-    def get_all_items(self) -> list[BaseModel]:
+    async def get_all_items(self) -> list[BaseOrmModel]:
         pass
 
     @abstractmethod
-    def add_item(self, data: BaseModel):
+    async def add_item(self, data: BaseOrmModel):
         pass
 
     @abstractmethod
-    def add_items(self, data: list[BaseModel]):
+    async def add_items(self, data: list[BaseOrmModel]):
         pass
 
     @abstractmethod
-    def delete_item_by_id(self, id: int):
+    async def delete_item_by_id(self, id: str):
         pass
 
     @abstractmethod
-    def update_item(self, data: BaseModel) -> BaseModel:
+    async def update_item(self, data) -> BaseOrmModel:
         pass

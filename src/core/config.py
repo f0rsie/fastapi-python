@@ -1,18 +1,11 @@
 from pydantic import PostgresDsn, computed_field
 from pydantic_core import MultiHostUrl
-from pydantic_settings import BaseSettings, SettingsConfigDict
+from pydantic_settings import BaseSettings
 
-#from dotenv import load_dotenv
-
-#load_dotenv()
 
 class Settings(BaseSettings):
     def __init__(self):
         return super().__init__()
-
-    model_config = SettingsConfigDict(
-        env_file=".env"
-    )
 
     DB_HOST: str
     DB_PORT: int
@@ -36,9 +29,9 @@ class Settings(BaseSettings):
             password=self.POSTGRES_PASSWORD,
             host=self.DB_HOST,
             port=self.DB_PORT,
-            path=self.POSTGRES_DB
+            path=self.POSTGRES_DB,
         )
-    
+
     @computed_field
     @property
     def SQLALCHEMY_DATABASE_URI(self) -> PostgresDsn:
@@ -48,7 +41,7 @@ class Settings(BaseSettings):
             password=self.POSTGRES_PASSWORD,
             host=self.DB_HOST,
             port=self.DB_PORT,
-            path=self.POSTGRES_DB
+            path=self.POSTGRES_DB,
         )
 
 

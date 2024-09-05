@@ -1,5 +1,11 @@
-satoday.com
-xcar.com.cn
-hulu.com
-archive.org
-sberbank.ru
+yahoo.com
+amazon.com
+wikipedia.org
+google.co.in
+twitter.com
+qq.com
+live.com
+taobao.com
+bing.com
+google.co.jp
+msn.com

@@ -1,16 +1,18 @@
 from functools import wraps
 import asyncio
-import time
+
+from fastapi.encoders import jsonable_encoder
+
 from fastapi.responses import JSONResponse
 from psycopg2 import OperationalError
 from icmplib.exceptions import SocketPermissionError
+from sqlalchemy.exc import NoResultFound
 
-import logging
+from errors.crud_errors import UserNotFoundInDb
+from schemas.errors_schemas import ErrorMessage
 
-logger = logging.getLogger("uvicorn")
 
-
-def utils_handler(func):
+def utils_errors_handler(func):
     @wraps(func)
     async def async_inner_func(*args, **kwargs):
         try:
@@ -39,11 +41,13 @@ def utils_handler(func):
         return inner_func
 
 
-def db_handler(func):
+def crud_errors_handler(func):
     @wraps(func)
     async def async_inner_func(*args, **kwargs):
         try:
             return await func(*args, **kwargs)
+        except NoResultFound as ex:
+            raise UserNotFoundInDb from ex
         except OperationalError as ex:
             raise ex
         except Exception as ex:
@@ -53,6 +57,8 @@ def db_handler(func):
     def inner_func(*args, **kwargs):
         try:
             return func(*args, **kwargs)
+        except NoResultFound as ex:
+            raise UserNotFoundInDb from ex
         except OperationalError as ex:
             raise ex
         except Exception as ex:
@@ -64,11 +70,13 @@ def db_handler(func):
         return inner_func
 
 
-def dao_handler(func):
+def dao_errors_handler(func):
     @wraps(func)
     async def async_inner_func(*args, **kwargs):
         try:
             return await func(*args, **kwargs)
+        except UserNotFoundInDb as ex:
+            raise ex
         except Exception as ex:
             raise ex
 
@@ -76,6 +84,8 @@ def dao_handler(func):
     def inner_func(*args, **kwargs):
         try:
             return func(*args, **kwargs)
+        except UserNotFoundInDb as ex:
+            raise ex
         except Exception as ex:
             raise ex
 
@@ -85,11 +95,13 @@ def dao_handler(func):
         return inner_func
 
 
-def controllers_handler(func):
+def controller_errors_handler(func):
     @wraps(func)
     async def async_inner_func(*args, **kwargs):
         try:
             return await func(*args, **kwargs)
+        except UserNotFoundInDb as ex:
+            raise ex
         except Exception as ex:
             raise ex
 
@@ -97,6 +109,8 @@ def controllers_handler(func):
     def inner_func(*args, **kwargs):
         try:
             return func(*args, **kwargs)
+        except UserNotFoundInDb as ex:
+            raise ex
         except Exception as ex:
             raise ex
 
@@ -106,20 +120,24 @@ def controllers_handler(func):
         return inner_func
 
 
-def routers_handler(func):
+def router_error_handler(func):
     @wraps(func)
     async def async_inner_func(*args, **kwargs):
         try:
             return await func(*args, **kwargs)
-        except Exception as ex:
-            return JSONResponse(str(ex), status_code=500)
+        except UserNotFoundInDb:
+            return JSONResponse(jsonable_encoder(ErrorMessage("User not found in database.")), 422)
+        except Exception:
+            return JSONResponse(jsonable_encoder(ErrorMessage("Unknown server error.")), 500)
 
     @wraps(func)
     def inner_func(*args, **kwargs):
         try:
             return func(*args, **kwargs)
-        except Exception as ex:
-            return JSONResponse(str(ex), status_code=500)
+        except UserNotFoundInDb:
+            return JSONResponse(jsonable_encoder(ErrorMessage("User not found in database.")), 422)
+        except Exception:
+            return JSONResponse(jsonable_encoder(ErrorMessage("Unknown server error.")), 500)
 
     if asyncio.iscoroutinefunction(func):
         return async_inner_func
@@ -128,6 +146,11 @@ def routers_handler(func):
 
 
 def logging_dec(func):
+    import time
+    import logging
+
+    logger = logging.getLogger("uvicorn")
+
     @wraps(func)
     async def async_inner_func(*args, **kwargs):
         start_time: float = time.perf_counter()

@@ -7,3 +7,7 @@ icmplib
 SQLAlchemy
 asyncpg
 pydantic_settings
+
+# dev
+black
+flake8

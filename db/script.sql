@@ -1,8 +1,8 @@
--- Active: 1724680656125@@127.0.0.1@5432@fastapi
+-- Active: 1724680656125@@db@5432@fastapi
 CREATE SCHEMA fastapi;
 
 CREATE TABLE "fastapi"."pings" (
-    "id" INTEGER PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+    "id" UUID PRIMARY KEY NOT NULL,
     "url" VARCHAR(50) NOT NULL,
     "is_available" BOOLEAN NOT NULL,
     "ping" VARCHAR(50) NOT NULL
