@@ -1,4 +1,5 @@
 from typing import Any, List
+from uuid import UUID
 from fastapi import APIRouter, Depends
 from fastapi.responses import JSONResponse
 from fastapi.encoders import jsonable_encoder
@@ -65,7 +66,7 @@ async def async_get_all(session: AsyncSession = Depends(async_get_db)):
 
 @router.get("/pings/by-id", response_model=Ping, responses=responses)
 @router_error_handler
-async def async_get_by_id(id: str, session: AsyncSession = Depends(async_get_db)):
+async def async_get_by_id(id: UUID, session: AsyncSession = Depends(async_get_db)):
     ping_controller = PingController(session)
 
     result: Ping = await ping_controller.get_by_id_func(id)
@@ -76,7 +77,7 @@ async def async_get_by_id(id: str, session: AsyncSession = Depends(async_get_db)
 
 @router.delete("/pings/delete", response_model=DeleteResult, responses=responses)
 @router_error_handler
-async def async_delete_by_id(id: str, session: AsyncSession = Depends(async_get_db)):
+async def async_delete_by_id(id: UUID, session: AsyncSession = Depends(async_get_db)):
     ping_controller = PingController(session)
 
     result = await ping_controller.delete_by_id_func(id)

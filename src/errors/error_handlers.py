@@ -124,10 +124,8 @@ def router_error_handler(func):
             return JSONResponse(
                 jsonable_encoder(ErrorMessage("User not found in database.")), 422
             )
-        except Exception:
-            return JSONResponse(
-                jsonable_encoder(ErrorMessage("Unknown server error.")), 500
-            )
+        except Exception as ex:
+            return JSONResponse(jsonable_encoder(ErrorMessage(str(ex))), 500)
 
     @wraps(func)
     def inner_func(*args, **kwargs):
@@ -137,10 +135,8 @@ def router_error_handler(func):
             return JSONResponse(
                 jsonable_encoder(ErrorMessage("User not found in database.")), 422
             )
-        except Exception:
-            return JSONResponse(
-                jsonable_encoder(ErrorMessage("Unknown server error.")), 500
-            )
+        except Exception as ex:
+            return JSONResponse(jsonable_encoder(ErrorMessage(str(ex))), 500)
 
     if asyncio.iscoroutinefunction(func):
         return async_inner_func

@@ -1,14 +1,14 @@
-from uuid import uuid4
+from uuid import UUID, uuid4
 from crud.ping_crud import PingCrud
 from dao.base_dao import BaseDAO
 from schemas.ping_schemas import DeleteResult, Ping
 from models.db.ping_orm_model import PingOrmModel
+from crud.base_crud import BaseCrud
 
 
 class PingDAO(BaseDAO):
     def __init__(self, session):
-        self.session = session
-        self.ping_crud = PingCrud(session)
+        self.ping_crud: BaseCrud = PingCrud(session)
 
     async def get_item(self, id: str) -> Ping:
         crud_result: PingOrmModel = await self.ping_crud.get_item_by_id(id)
@@ -24,7 +24,7 @@ class PingDAO(BaseDAO):
 
         return result
 
-    async def add_item(self, data: Ping):
+    async def add_item(self, data: Ping) -> bool:
         data.id = uuid4()
 
         crud_input = PingOrmModel(data)
@@ -32,7 +32,7 @@ class PingDAO(BaseDAO):
         await self.ping_crud.add_item(crud_input)
         return True
 
-    async def add_many_items(self, data: list[Ping]):
+    async def add_many_items(self, data: list[Ping]) -> bool:
         for item in data:
             item.id = uuid4()
 
@@ -48,7 +48,7 @@ class PingDAO(BaseDAO):
 
         return result
 
-    async def delete_item(self, id: str) -> DeleteResult:
+    async def delete_item(self, id: UUID) -> DeleteResult:
         await self.ping_crud.delete_item_by_id(id)
-        
+
         return DeleteResult(True)

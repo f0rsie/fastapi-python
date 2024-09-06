@@ -1,13 +1,13 @@
 from dataclasses import dataclass
 from typing import List
 from uuid import uuid4
-from pydantic import BaseModel, UUID4
+from pydantic import UUID4, BaseModel
 
 
 @dataclass
 class Ping(BaseModel):
-    def __init__(self):
-        return super().__init__()
+    def __init__(self, **data):
+        return super().__init__(**data)
 
     id: UUID4 = uuid4()
     url: str = "example.com"

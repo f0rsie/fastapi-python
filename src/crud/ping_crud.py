@@ -1,3 +1,4 @@
+from uuid import UUID
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -12,7 +13,7 @@ class PingCrud(BaseCrud):
         self.session: AsyncSession = session
 
     @crud_errors_handler
-    async def get_item_by_id(self, id: str) -> PingOrmModel:
+    async def get_item_by_id(self, id: UUID) -> PingOrmModel:
         result: PingOrmModel = await self.session.get_one(PingOrmModel, id)
         return result
 
@@ -21,7 +22,6 @@ class PingCrud(BaseCrud):
         result: list[PingOrmModel] = list(
             (await self.session.scalars(select(PingOrmModel))).all()
         )
-
         return result
 
     @crud_errors_handler
@@ -33,7 +33,7 @@ class PingCrud(BaseCrud):
         self.session.add_all(data)
 
     @crud_errors_handler
-    async def delete_item_by_id(self, id: str):
+    async def delete_item_by_id(self, id: UUID):
         item: PingOrmModel = await self.session.get_one(PingOrmModel, id)
         await self.session.delete(item)
 

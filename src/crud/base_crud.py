@@ -1,11 +1,12 @@
 from abc import ABC, abstractmethod
+from uuid import UUID
 
 from models.db.base_orm_model import BaseOrmModel
 
 
 class BaseCrud(ABC):
     @abstractmethod
-    async def get_item_by_id(self, id: str) -> BaseOrmModel:
+    async def get_item_by_id(self, id: UUID) -> BaseOrmModel:
         pass
 
     @abstractmethod
@@ -21,7 +22,7 @@ class BaseCrud(ABC):
         pass
 
     @abstractmethod
-    async def delete_item_by_id(self, id: str):
+    async def delete_item_by_id(self, id: UUID):
         pass
 
     @abstractmethod

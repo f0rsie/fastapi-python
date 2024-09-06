@@ -1,5 +1,9 @@
 from time import perf_counter
+from uuid import UUID
 from schemas.ping_schemas import DeleteResult, Result, Ping
+
+from dao.base_dao import BaseDAO
+from dao.ping_dao import PingDAO
 
 from utils.utils import read_file, async_read_file, check_pings, async_check_pings
 
@@ -8,12 +12,11 @@ import asyncio
 from core.config import settings
 
 from controllers.base_controller import BaseController
-from dao.ping_dao import PingDAO
 
 
 class PingController(BaseController):
     def __init__(self, session):
-        self.ping_dao = PingDAO(session)
+        self.ping_dao: BaseDAO = PingDAO(session)
 
     def test_func(self) -> Result:
         start_time: float = perf_counter().real
@@ -48,12 +51,12 @@ class PingController(BaseController):
 
         return result_list
 
-    async def get_by_id_func(self, id: str) -> Ping:
+    async def get_by_id_func(self, id: UUID) -> Ping:
         result: Ping = await self.ping_dao.get_item(id)
 
         return result
 
-    async def delete_by_id_func(self, id: str):
+    async def delete_by_id_func(self, id: UUID):
         result: DeleteResult = await self.ping_dao.delete_item(id)
 
         return result
