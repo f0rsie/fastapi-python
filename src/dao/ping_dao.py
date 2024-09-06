@@ -1,7 +1,7 @@
 from uuid import uuid4
 from crud.ping_crud import PingCrud
 from dao.base_dao import BaseDAO
-from schemas.ping_schemas import Ping
+from schemas.ping_schemas import DeleteResult, Ping
 from models.db.ping_orm_model import PingOrmModel
 
 
@@ -48,6 +48,7 @@ class PingDAO(BaseDAO):
 
         return result
 
-    async def delete_item(self, id: str):
+    async def delete_item(self, id: str) -> DeleteResult:
         await self.ping_crud.delete_item_by_id(id)
-        return True
+        
+        return DeleteResult(True)

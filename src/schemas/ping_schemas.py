@@ -26,9 +26,10 @@ class Result(BaseModel):
     pings: List[Ping]
     total_pings_time: str = "102 sec"
 
+
 @dataclass
 class DeleteResult(BaseModel):
-    def __init__(self):
-        return super().__init__()
-    
+    def __init__(self, success_status):
+        return super().__init__(success_status=success_status)
+
     success_status: bool = True

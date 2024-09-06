@@ -1,13 +1,12 @@
 fastapi
 uvicorn
-aiofiles
-psycopg2-binary
-aioping
-icmplib
-SQLAlchemy
-asyncpg
+
 pydantic_settings
 
-# dev
-black
-flake8
+aiofiles
+
+SQLAlchemy
+psycopg2-binary
+asyncpg
+
+icmplib

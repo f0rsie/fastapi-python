@@ -3,22 +3,24 @@
 
 services:
   app:
-    container_name: app
+    container_name: fastapi-app
+    restart: always
     depends_on:
       - db
     build:
       context: .
       dockerfile: Dockerfile
+      target: prod
     env_file:
       - .env
     environment:
       ENV: "production"
     ports:
       - "8000:8000"
-    command: ["python", "src/main.py"]
     
   db:
     image: postgres
+    container_name: fastapi-db
     restart: always
     env_file:
       - .env

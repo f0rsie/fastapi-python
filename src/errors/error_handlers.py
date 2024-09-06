@@ -4,7 +4,6 @@ import asyncio
 from fastapi.encoders import jsonable_encoder
 
 from fastapi.responses import JSONResponse
-from psycopg2 import OperationalError
 from icmplib.exceptions import SocketPermissionError
 from sqlalchemy.exc import NoResultFound
 
@@ -48,8 +47,6 @@ def crud_errors_handler(func):
             return await func(*args, **kwargs)
         except NoResultFound as ex:
             raise UserNotFoundInDb from ex
-        except OperationalError as ex:
-            raise ex
         except Exception as ex:
             raise ex
 
@@ -59,8 +56,6 @@ def crud_errors_handler(func):
             return func(*args, **kwargs)
         except NoResultFound as ex:
             raise UserNotFoundInDb from ex
-        except OperationalError as ex:
-            raise ex
         except Exception as ex:
             raise ex
 
@@ -126,18 +121,26 @@ def router_error_handler(func):
         try:
             return await func(*args, **kwargs)
         except UserNotFoundInDb:
-            return JSONResponse(jsonable_encoder(ErrorMessage("User not found in database.")), 422)
+            return JSONResponse(
+                jsonable_encoder(ErrorMessage("User not found in database.")), 422
+            )
         except Exception:
-            return JSONResponse(jsonable_encoder(ErrorMessage("Unknown server error.")), 500)
+            return JSONResponse(
+                jsonable_encoder(ErrorMessage("Unknown server error.")), 500
+            )
 
     @wraps(func)
     def inner_func(*args, **kwargs):
         try:
             return func(*args, **kwargs)
         except UserNotFoundInDb:
-            return JSONResponse(jsonable_encoder(ErrorMessage("User not found in database.")), 422)
+            return JSONResponse(
+                jsonable_encoder(ErrorMessage("User not found in database.")), 422
+            )
         except Exception:
-            return JSONResponse(jsonable_encoder(ErrorMessage("Unknown server error.")), 500)
+            return JSONResponse(
+                jsonable_encoder(ErrorMessage("Unknown server error.")), 500
+            )
 
     if asyncio.iscoroutinefunction(func):
         return async_inner_func

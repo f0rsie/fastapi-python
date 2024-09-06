@@ -1,5 +1,5 @@
 from time import perf_counter
-from schemas.ping_schemas import Result, Ping
+from schemas.ping_schemas import DeleteResult, Result, Ping
 
 from utils.utils import read_file, async_read_file, check_pings, async_check_pings
 
@@ -54,6 +54,6 @@ class PingController(BaseController):
         return result
 
     async def delete_by_id_func(self, id: str):
-        result = await self.ping_dao.delete_item(id)
+        result: DeleteResult = await self.ping_dao.delete_item(id)
 
         return result

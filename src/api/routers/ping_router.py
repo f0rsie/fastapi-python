@@ -3,7 +3,6 @@ from fastapi import APIRouter, Depends
 from fastapi.responses import JSONResponse
 from fastapi.encoders import jsonable_encoder
 
-from pydantic import BaseModel
 from sqlalchemy.orm.session import Session
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -21,12 +20,12 @@ router = APIRouter()
 
 responses: dict[int | str, dict[str, Any]] = {
     422: {
-        "model": ErrorMessage("User not found in db."),
-        "description": "User not found in db.",
+        "model": ErrorMessage("User not found in db"),
+        "description": "User not found in db",
     },
     500: {
-        "model": ErrorMessage("Unknown server error."),
-        "description": "Unknown server error.",
+        "model": ErrorMessage("Unknown server error"),
+        "description": "Unknown server error",
     },
 }
 
